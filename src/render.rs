@@ -88,6 +88,7 @@ fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
             word_len = 0;
         } else {
             word_len += 1;
+            current_line.push(tc);
         }
     }
 
