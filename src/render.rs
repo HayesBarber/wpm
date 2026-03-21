@@ -151,7 +151,7 @@ fn render_layout(layout: &Layout) {
             match tc.state {
                 CharState::Correct => print!("\x1b[32m{}\x1b[0m", tc.ch),
                 CharState::Incorrect => print!("\x1b[31m{}\x1b[0m", tc.ch),
-                CharState::Pending => print!("{}", tc.ch),
+                CharState::Pending => print!("\x1b[90m{}\x1b[0m", tc.ch),
             }
             io::stdout().flush().unwrap();
         }
