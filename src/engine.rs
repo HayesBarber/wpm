@@ -47,7 +47,8 @@ pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
     for (line_idx, line) in lines.iter().enumerate() {
         let row = start_row + line_idx as u16;
         let line_len: u16 = line.iter().map(|tc| tc.ch.len_utf16() as u16).sum();
-        let start_col = PADDING + max_width.saturating_sub(line_len) / 2;
+        let available_width = cols.saturating_sub(2 * PADDING);
+        let start_col = PADDING + available_width.saturating_sub(line_len) / 2;
         let positioned: Vec<(u16, u16, TypedChar)> = line
             .iter()
             .enumerate()
