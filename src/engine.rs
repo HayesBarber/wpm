@@ -1,9 +1,9 @@
 use std::time::Instant;
 
-use crate::types::{CharState, Layout, PADDING, TestStats, TypedChar};
+use crate::types::{CharState, Layout, MAX_LINE_WIDTH, PADDING, TestStats, TypedChar};
 
 pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
-    let max_width = cols.saturating_sub(2 * PADDING);
+    let max_width = std::cmp::min(cols.saturating_sub(2 * PADDING), MAX_LINE_WIDTH);
     let max_height = rows.saturating_sub(2 * PADDING);
 
     let mut lines: Vec<Vec<TypedChar>> = Vec::new();
