@@ -46,6 +46,9 @@ impl App {
                 ..
             }) if modifiers.contains(KeyModifiers::CONTROL) => true,
             Event::Key(KeyEvent {
+                code: KeyCode::Esc, ..
+            }) => true,
+            Event::Key(KeyEvent {
                 code: KeyCode::Backspace,
                 ..
             }) => self.handle_backspace(),
