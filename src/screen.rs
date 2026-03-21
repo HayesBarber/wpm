@@ -1,18 +1,12 @@
-use crate::types::{CharState, Layout};
+use crate::types::{CharState, Layout, TypedChar};
 
-#[derive(Clone, Copy, PartialEq, Eq)]
-pub struct Cell {
-    pub ch: char,
-    pub state: CharState,
-}
-
-const EMPTY_CELL: Cell = Cell {
+const EMPTY: TypedChar = TypedChar {
     ch: ' ',
     state: CharState::Pending,
 };
 
 pub struct ScreenBuf {
-    cells: Vec<Vec<Cell>>,
+    cells: Vec<Vec<TypedChar>>,
     pub rows: usize,
     pub cols: usize,
 }
@@ -20,7 +14,7 @@ pub struct ScreenBuf {
 impl ScreenBuf {
     pub fn new(rows: usize, cols: usize) -> Self {
         ScreenBuf {
-            cells: vec![vec![EMPTY_CELL; cols]; rows],
+            cells: vec![vec![EMPTY; cols]; rows],
             rows,
             cols,
         }
@@ -28,11 +22,11 @@ impl ScreenBuf {
 
     pub fn set(&mut self, row: usize, col: usize, ch: char, state: CharState) {
         if row < self.rows && col < self.cols {
-            self.cells[row][col] = Cell { ch, state };
+            self.cells[row][col] = TypedChar { ch, state };
         }
     }
 
-    pub fn diff<'a>(&'a self, prev: &'a ScreenBuf) -> Vec<(u16, u16, Cell)> {
+    pub fn diff<'a>(&'a self, prev: &'a ScreenBuf) -> Vec<(u16, u16, TypedChar)> {
         let min_rows = self.rows.min(prev.rows);
         let min_cols = self.cols.min(prev.cols);
         let mut changes = Vec::new();

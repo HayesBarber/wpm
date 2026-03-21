@@ -1,7 +1,6 @@
 use std::io::{self, Write};
 
-use crate::screen::Cell;
-use crate::types::{CharState, Layout, TestStats};
+use crate::types::{CharState, Layout, TestStats, TypedChar};
 
 #[repr(C)]
 struct WinSize {
@@ -83,15 +82,15 @@ pub fn render_layout(layout: &Layout) {
     io::stdout().flush().unwrap();
 }
 
-pub fn render_changes(changes: &[(u16, u16, Cell)], cursor_row: u16, cursor_col: u16) {
+pub fn render_changes(changes: &[(u16, u16, TypedChar)], cursor_row: u16, cursor_col: u16) {
     if changes.is_empty() {
         return;
     }
 
     hide_cursor();
-    for &(row, col, cell) in changes {
+    for &(row, col, tc) in changes {
         move_cursor(row, col);
-        print_styled(cell.ch, cell.state);
+        print_styled(tc.ch, tc.state);
     }
     move_cursor(cursor_row, cursor_col);
     show_cursor();
