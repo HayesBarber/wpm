@@ -6,6 +6,7 @@ pub struct App {
     words: String,
     chars: Vec<TypedChar>,
     layout: Layout,
+    cursor_index: usize,
 }
 
 impl App {
@@ -27,6 +28,7 @@ impl App {
             words,
             chars,
             layout,
+            cursor_index: 0,
         }
     }
 
@@ -37,6 +39,26 @@ impl App {
                 modifiers,
                 ..
             }) if modifiers.contains(KeyModifiers::CONTROL) => true,
+            Event::Key(KeyEvent {
+                code: KeyCode::Char(ch),
+                modifiers,
+                ..
+            }) if !modifiers.contains(KeyModifiers::CONTROL) => {
+                if self.cursor_index < self.chars.len() {
+                    let expected = self.chars[self.cursor_index].ch;
+                    self.chars[self.cursor_index].state = if ch == expected {
+                        CharState::Correct
+                    } else {
+                        CharState::Incorrect
+                    };
+                    self.cursor_index += 1;
+
+                    let (cols, rows) = crate::render::get_terminal_size();
+                    self.layout = crate::engine::layout(cols, rows, &self.chars);
+                    crate::render::render_layout(&self.layout);
+                }
+                false
+            }
             _ => false,
         }
     }
