@@ -46,6 +46,10 @@ impl App {
                 ..
             }) if modifiers.contains(KeyModifiers::CONTROL) => true,
             Event::Key(KeyEvent {
+                code: KeyCode::Backspace,
+                ..
+            }) => self.handle_backspace(),
+            Event::Key(KeyEvent {
                 code: KeyCode::Char(ch),
                 modifiers,
                 ..
@@ -73,6 +77,16 @@ impl App {
         self.refresh();
 
         self.cursor_index >= self.chars.len()
+    }
+
+    fn handle_backspace(&mut self) -> bool {
+        if self.cursor_index == 0 {
+            return false;
+        }
+        self.cursor_index -= 1;
+        self.chars[self.cursor_index].state = CharState::Pending;
+        self.refresh();
+        false
     }
 
     pub fn stats(&self) -> Option<TestStats> {
