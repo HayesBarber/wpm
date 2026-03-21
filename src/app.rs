@@ -2,11 +2,13 @@ use std::time::Instant;
 
 use crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers};
 
+use crate::screen::ScreenBuf;
 use crate::types::{CharState, Layout, TestStats, TypedChar};
 
 pub struct App {
     chars: Vec<TypedChar>,
     layout: Layout,
+    prev_buf: ScreenBuf,
     cursor_index: usize,
     term_rows: u16,
     term_cols: u16,
@@ -26,11 +28,16 @@ impl App {
 
         let (term_cols, term_rows) = crate::render::get_terminal_size();
         let layout = crate::engine::layout(term_cols, term_rows, &chars);
+
         crate::render::render_layout(&layout);
+
+        let mut prev_buf = ScreenBuf::new(term_rows as usize, term_cols as usize);
+        prev_buf.apply_layout(&layout);
 
         App {
             chars,
             layout,
+            prev_buf,
             cursor_index: 0,
             term_rows,
             term_cols,
@@ -99,6 +106,13 @@ impl App {
 
     fn refresh(&mut self) {
         self.layout = crate::engine::layout(self.term_cols, self.term_rows, &self.chars);
-        crate::render::render_layout(&self.layout);
+
+        let mut desired = ScreenBuf::new(self.prev_buf.rows, self.prev_buf.cols);
+        desired.apply_layout(&self.layout);
+
+        let changes = desired.diff(&self.prev_buf);
+        crate::render::render_changes(&changes, self.layout.cursor_row, self.layout.cursor_col);
+
+        self.prev_buf = desired;
     }
 }
