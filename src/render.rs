@@ -1,5 +1,6 @@
 use std::io::{self, Write};
-use std::sync::atomic::{AtomicBool, Ordering};
+
+use crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers};
 
 #[repr(C)]
 struct WinSize {
@@ -28,7 +29,6 @@ struct Layout {
     cursor_col: u16,
 }
 
-static RUNNING: AtomicBool = AtomicBool::new(true);
 const PADDING: u16 = 8;
 
 fn enter_alternate_buffer() {
@@ -161,12 +161,8 @@ fn render_layout(layout: &Layout) {
 }
 
 pub fn run() {
-    ctrlc::set_handler(|| {
-        RUNNING.store(false, Ordering::SeqCst);
-    })
-    .expect("Error setting Ctrl-C handler");
-
     enter_alternate_buffer();
+    crate::input::enable_raw_mode().expect("Failed to enable raw mode");
 
     let words = crate::generator::generate(25);
     let chars: Vec<TypedChar> = words
@@ -181,7 +177,17 @@ pub fn run() {
     let l = layout(cols, rows, &chars);
     render_layout(&l);
 
-    while RUNNING.load(Ordering::SeqCst) {}
+    loop {
+        match crate::input::read_event() {
+            Ok(Event::Key(KeyEvent {
+                code: KeyCode::Char('c'),
+                modifiers,
+                ..
+            })) if modifiers.contains(KeyModifiers::CONTROL) => break,
+            _ => {}
+        }
+    }
 
+    crate::input::disable_raw_mode().expect("Failed to disable raw mode");
     leave_alternate_buffer();
 }
