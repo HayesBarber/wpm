@@ -9,7 +9,7 @@ pub struct App {
 }
 
 impl App {
-    pub fn init() -> Self {
+    pub fn new() -> Self {
         let words = crate::generator::generate(25);
         let chars: Vec<TypedChar> = words
             .chars()
@@ -23,7 +23,11 @@ impl App {
         let layout = crate::engine::layout(cols, rows, &chars);
         crate::render::render_layout(&layout);
 
-        App { words, chars, layout }
+        App {
+            words,
+            chars,
+            layout,
+        }
     }
 
     pub fn handle_event(&mut self, event: Event) -> bool {

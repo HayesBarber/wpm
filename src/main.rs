@@ -9,7 +9,7 @@ fn main() {
     render::setup();
     crate::input::enable_raw_mode().expect("Failed to enable raw mode");
 
-    let mut app = app::App::init();
+    let mut app = app::App::new();
 
     loop {
         match crate::input::read_event() {
