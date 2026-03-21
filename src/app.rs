@@ -1,6 +1,8 @@
+use std::time::Instant;
+
 use crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers};
 
-use crate::types::{CharState, Layout, TypedChar};
+use crate::types::{CharState, Layout, TestStats, TypedChar};
 
 pub struct App {
     chars: Vec<TypedChar>,
@@ -8,6 +10,7 @@ pub struct App {
     cursor_index: usize,
     term_rows: u16,
     term_cols: u16,
+    start_time: Option<Instant>,
 }
 
 impl App {
@@ -31,6 +34,7 @@ impl App {
             cursor_index: 0,
             term_rows,
             term_cols,
+            start_time: None,
         }
     }
 
@@ -45,17 +49,18 @@ impl App {
                 code: KeyCode::Char(ch),
                 modifiers,
                 ..
-            }) if !modifiers.contains(KeyModifiers::CONTROL) => {
-                self.handle_char_input(ch);
-                false
-            }
+            }) if !modifiers.contains(KeyModifiers::CONTROL) => self.handle_char_input(ch),
             _ => false,
         }
     }
 
-    fn handle_char_input(&mut self, ch: char) {
+    fn handle_char_input(&mut self, ch: char) -> bool {
         if self.cursor_index >= self.chars.len() {
-            return;
+            return true;
+        }
+
+        if self.start_time.is_none() {
+            self.start_time = Some(Instant::now());
         }
 
         let expected = self.chars[self.cursor_index].ch;
@@ -66,6 +71,13 @@ impl App {
         };
         self.cursor_index += 1;
         self.refresh();
+
+        self.cursor_index >= self.chars.len()
+    }
+
+    pub fn stats(&self) -> Option<TestStats> {
+        self.start_time
+            .map(|start| crate::engine::compute_stats(&self.chars, start))
     }
 
     fn refresh(&mut self) {
