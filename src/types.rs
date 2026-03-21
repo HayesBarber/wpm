@@ -1,25 +1,8 @@
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum CharState {
     Pending,
     Correct,
     Incorrect,
-}
-
-#[derive(Clone, Copy, PartialEq, Eq)]
-pub enum Style {
-    Pending,
-    Correct,
-    Incorrect,
-}
-
-impl From<CharState> for Style {
-    fn from(state: CharState) -> Self {
-        match state {
-            CharState::Pending => Style::Pending,
-            CharState::Correct => Style::Correct,
-            CharState::Incorrect => Style::Incorrect,
-        }
-    }
 }
 
 #[derive(Clone, Copy)]

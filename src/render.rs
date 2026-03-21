@@ -1,7 +1,7 @@
 use std::io::{self, Write};
 
 use crate::screen::Cell;
-use crate::types::{CharState, Layout, Style, TestStats};
+use crate::types::{CharState, Layout, TestStats};
 
 #[repr(C)]
 struct WinSize {
@@ -89,10 +89,10 @@ pub fn render_changes(changes: &[(u16, u16, Cell)], cursor_row: u16, cursor_col:
     hide_cursor();
     for &(row, col, cell) in changes {
         move_cursor(row, col);
-        match cell.style {
-            Style::Correct => print!("\x1b[1;92m{}\x1b[0m", cell.ch),
-            Style::Incorrect => print!("\x1b[1;91m{}\x1b[0m", cell.ch),
-            Style::Pending => print!("\x1b[90m{}\x1b[0m", cell.ch),
+        match cell.state {
+            CharState::Correct => print!("\x1b[1;92m{}\x1b[0m", cell.ch),
+            CharState::Incorrect => print!("\x1b[1;91m{}\x1b[0m", cell.ch),
+            CharState::Pending => print!("\x1b[90m{}\x1b[0m", cell.ch),
         }
     }
     move_cursor(cursor_row, cursor_col);

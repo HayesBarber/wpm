@@ -1,14 +1,14 @@
-use crate::types::{Layout, Style};
+use crate::types::{CharState, Layout};
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct Cell {
     pub ch: char,
-    pub style: Style,
+    pub state: CharState,
 }
 
 const EMPTY_CELL: Cell = Cell {
     ch: ' ',
-    style: Style::Pending,
+    state: CharState::Pending,
 };
 
 pub struct ScreenBuf {
@@ -26,9 +26,9 @@ impl ScreenBuf {
         }
     }
 
-    pub fn set(&mut self, row: usize, col: usize, ch: char, style: Style) {
+    pub fn set(&mut self, row: usize, col: usize, ch: char, state: CharState) {
         if row < self.rows && col < self.cols {
-            self.cells[row][col] = Cell { ch, style };
+            self.cells[row][col] = Cell { ch, state };
         }
     }
 
@@ -63,7 +63,7 @@ impl ScreenBuf {
     pub fn apply_layout(&mut self, layout: &Layout) {
         for line in &layout.lines {
             for &(row, col, tc) in line {
-                self.set(row as usize, col as usize, tc.ch, tc.state.into());
+                self.set(row as usize, col as usize, tc.ch, tc.state);
             }
         }
     }
