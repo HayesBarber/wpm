@@ -1,4 +1,4 @@
-use crate::types::{CharState, Layout, TypedChar, PADDING};
+use crate::types::{CharState, Layout, PADDING, TypedChar};
 
 pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
     let max_width = cols.saturating_sub(2 * PADDING);
