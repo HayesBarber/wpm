@@ -14,8 +14,8 @@ pub struct App {
 }
 
 impl App {
-    pub fn new() -> Self {
-        let words = crate::generator::generate(25);
+    pub fn new(num_words: usize) -> Self {
+        let words = crate::generator::generate(num_words);
         let chars: Vec<TypedChar> = words
             .chars()
             .map(|ch| TypedChar {
