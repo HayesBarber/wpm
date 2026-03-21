@@ -25,9 +25,16 @@ fn clear_screen() {
     io::stdout().flush().unwrap();
 }
 
+fn hide_cursor() {
+    print!("\x1b[?25l");
+}
+
+fn show_cursor() {
+    print!("\x1b[?25h");
+}
+
 fn move_cursor(row: u16, col: u16) {
     print!("\x1b[{};{}H", row, col);
-    io::stdout().flush().unwrap();
 }
 
 pub fn get_terminal_size() -> (u16, u16) {
@@ -45,6 +52,7 @@ pub fn get_terminal_size() -> (u16, u16) {
 
 pub fn render_layout(layout: &Layout) {
     clear_screen();
+    hide_cursor();
     for line in &layout.lines {
         for &(row, col, tc) in line {
             move_cursor(row, col);
@@ -53,10 +61,10 @@ pub fn render_layout(layout: &Layout) {
                 CharState::Incorrect => print!("\x1b[31m{}\x1b[0m", tc.ch),
                 CharState::Pending => print!("\x1b[90m{}\x1b[0m", tc.ch),
             }
-            io::stdout().flush().unwrap();
         }
     }
     move_cursor(layout.cursor_row, layout.cursor_col);
+    show_cursor();
     io::stdout().flush().unwrap();
 }
 
