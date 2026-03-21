@@ -6,6 +6,8 @@ pub struct App {
     chars: Vec<TypedChar>,
     layout: Layout,
     cursor_index: usize,
+    term_rows: u16,
+    term_cols: u16,
 }
 
 impl App {
@@ -19,14 +21,16 @@ impl App {
             })
             .collect();
 
-        let (cols, rows) = crate::render::get_terminal_size();
-        let layout = crate::engine::layout(cols, rows, &chars);
+        let (term_cols, term_rows) = crate::render::get_terminal_size();
+        let layout = crate::engine::layout(term_cols, term_rows, &chars);
         crate::render::render_layout(&layout);
 
         App {
             chars,
             layout,
             cursor_index: 0,
+            term_rows,
+            term_cols,
         }
     }
 
@@ -65,8 +69,7 @@ impl App {
     }
 
     fn refresh(&mut self) {
-        let (cols, rows) = crate::render::get_terminal_size();
-        self.layout = crate::engine::layout(cols, rows, &self.chars);
+        self.layout = crate::engine::layout(self.term_cols, self.term_rows, &self.chars);
         crate::render::render_layout(&self.layout);
     }
 }
