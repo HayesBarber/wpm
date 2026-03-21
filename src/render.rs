@@ -33,6 +33,16 @@ fn show_cursor() {
     print!("\x1b[?25h");
 }
 
+fn set_line_cursor() {
+    print!("\x1b[6 q");
+    io::stdout().flush().unwrap();
+}
+
+fn reset_cursor_style() {
+    print!("\x1b[0 q");
+    io::stdout().flush().unwrap();
+}
+
 fn move_cursor(row: u16, col: u16) {
     print!("\x1b[{};{}H", row, col);
 }
@@ -70,9 +80,11 @@ pub fn render_layout(layout: &Layout) {
 
 pub fn setup() {
     enter_alternate_buffer();
+    set_line_cursor();
 }
 
 pub fn teardown() {
+    reset_cursor_style();
     leave_alternate_buffer();
 }
 
