@@ -48,6 +48,14 @@ fn move_cursor(row: u16, col: u16) {
     print!("\x1b[{};{}H", row, col);
 }
 
+fn print_styled(ch: char, state: CharState) {
+    match state {
+        CharState::Correct => print!("\x1b[1;92m{}\x1b[0m", ch),
+        CharState::Incorrect => print!("\x1b[1;91m{}\x1b[0m", ch),
+        CharState::Pending => print!("\x1b[90m{}\x1b[0m", ch),
+    }
+}
+
 pub fn get_terminal_size() -> (u16, u16) {
     let mut ws = WinSize {
         ws_row: 0,
@@ -67,11 +75,7 @@ pub fn render_layout(layout: &Layout) {
     for line in &layout.lines {
         for &(row, col, tc) in line {
             move_cursor(row, col);
-            match tc.state {
-                CharState::Correct => print!("\x1b[1;92m{}\x1b[0m", tc.ch),
-                CharState::Incorrect => print!("\x1b[1;91m{}\x1b[0m", tc.ch),
-                CharState::Pending => print!("\x1b[90m{}\x1b[0m", tc.ch),
-            }
+            print_styled(tc.ch, tc.state);
         }
     }
     move_cursor(layout.cursor_row, layout.cursor_col);
@@ -89,11 +93,7 @@ pub fn render_changes(changes: &[(u16, u16, Cell)], cursor_row: u16, cursor_col:
     hide_cursor();
     for &(row, col, cell) in changes {
         move_cursor(row, col);
-        match cell.state {
-            CharState::Correct => print!("\x1b[1;92m{}\x1b[0m", cell.ch),
-            CharState::Incorrect => print!("\x1b[1;91m{}\x1b[0m", cell.ch),
-            CharState::Pending => print!("\x1b[90m{}\x1b[0m", cell.ch),
-        }
+        print_styled(cell.ch, cell.state);
     }
     move_cursor(cursor_row, cursor_col);
     show_cursor();
