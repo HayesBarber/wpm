@@ -67,8 +67,8 @@ pub fn render_layout(layout: &Layout) {
         for &(row, col, tc) in line {
             move_cursor(row, col);
             match tc.state {
-                CharState::Correct => print!("\x1b[32m{}\x1b[0m", tc.ch),
-                CharState::Incorrect => print!("\x1b[31m{}\x1b[0m", tc.ch),
+                CharState::Correct => print!("\x1b[1;92m{}\x1b[0m", tc.ch),
+                CharState::Incorrect => print!("\x1b[1;91m{}\x1b[0m", tc.ch),
                 CharState::Pending => print!("\x1b[90m{}\x1b[0m", tc.ch),
             }
         }
