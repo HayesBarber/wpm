@@ -1,3 +1,5 @@
+mod render;
+
 fn main() {
-    println!("Hello, world!");
+    render::run();
 }
