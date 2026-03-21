@@ -51,6 +51,7 @@ fn render_centered(text: &str) {
     clear_screen();
     move_cursor(row, col);
     print!("{}", text);
+    move_cursor(row, col);
     io::stdout().flush().unwrap();
 }
 
@@ -62,7 +63,8 @@ pub fn run() {
 
     enter_alternate_buffer();
 
-    render_centered("hello world");
+    let words = crate::generator::generate(25);
+    render_centered(&words);
 
     while RUNNING.load(Ordering::SeqCst) {}
 
