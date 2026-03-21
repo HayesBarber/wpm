@@ -10,6 +10,7 @@ struct WinSize {
 }
 
 static RUNNING: AtomicBool = AtomicBool::new(true);
+const PADDING: u16 = 8;
 
 fn enter_alternate_buffer() {
     print!("\x1b[?1049h");
@@ -44,14 +45,45 @@ fn get_terminal_size() -> (u16, u16) {
     (ws.ws_col, ws.ws_row)
 }
 
+fn wrap_words(text: &str, max_width: u16) -> Vec<String> {
+    let mut lines: Vec<String> = Vec::new();
+    let mut current_line = String::new();
+    for word in text.split_whitespace() {
+        if !current_line.is_empty() && current_line.len() + 1 + word.len() > max_width as usize {
+            lines.push(current_line);
+            current_line = String::from(word);
+        } else {
+            if !current_line.is_empty() {
+                current_line.push(' ');
+            }
+            current_line.push_str(word);
+        }
+    }
+    if !current_line.is_empty() {
+        lines.push(current_line);
+    }
+    lines
+}
+
 fn render_centered(text: &str) {
     let (cols, rows) = get_terminal_size();
-    let row = rows / 2;
-    let col = cols.saturating_sub(text.len() as u16) / 2;
+    let available_width = cols.saturating_sub(2 * PADDING);
+    let available_height = rows.saturating_sub(2 * PADDING);
+    let lines = wrap_words(text, available_width);
+    let line_count = lines.len() as u16;
+    let start_row = PADDING + available_height.saturating_sub(line_count) / 2;
     clear_screen();
-    move_cursor(row, col);
-    print!("{}", text);
-    move_cursor(row, col);
+    for (i, line) in lines.iter().enumerate() {
+        let col = PADDING + available_width.saturating_sub(line.len() as u16) / 2;
+        move_cursor(start_row + i as u16, col);
+        print!("{}", line);
+    }
+    if lines.len() > 0 {
+        move_cursor(
+            start_row as u16,
+            PADDING + available_width.saturating_sub(lines[0].len() as u16) / 2,
+        );
+    }
     io::stdout().flush().unwrap();
 }
 
