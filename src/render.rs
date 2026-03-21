@@ -1,5 +1,5 @@
 use std::io::{self, Write};
-use std::time::Duration;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 #[repr(C)]
 struct WinSize {
@@ -8,6 +8,8 @@ struct WinSize {
     ws_xpixel: libc::c_ushort,
     ws_ypixel: libc::c_ushort,
 }
+
+static RUNNING: AtomicBool = AtomicBool::new(true);
 
 fn enter_alternate_buffer() {
     print!("\x1b[?1049h");
@@ -53,18 +55,16 @@ fn render_centered(text: &str) {
 }
 
 pub fn run() {
+    ctrlc::set_handler(|| {
+        RUNNING.store(false, Ordering::SeqCst);
+    })
+    .expect("Error setting Ctrl-C handler");
+
     enter_alternate_buffer();
 
-    struct Guard;
-    impl Drop for Guard {
-        fn drop(&mut self) {
-            leave_alternate_buffer();
-        }
-    }
-    let _guard = Guard;
+    render_centered("hello world");
 
-    loop {
-        render_centered("hello world");
-        std::thread::sleep(Duration::from_millis(100));
-    }
+    while RUNNING.load(Ordering::SeqCst) {}
+
+    leave_alternate_buffer();
 }
