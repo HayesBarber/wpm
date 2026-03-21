@@ -9,7 +9,18 @@ fn main() {
     render::setup();
     crate::input::enable_raw_mode().expect("Failed to enable raw mode");
 
-    app::run();
+    let mut app = app::App::init();
+
+    loop {
+        match crate::input::read_event() {
+            Ok(event) => {
+                if app.handle_event(event) {
+                    break;
+                }
+            }
+            _ => {}
+        }
+    }
 
     crate::input::disable_raw_mode().expect("Failed to disable raw mode");
     render::teardown();
