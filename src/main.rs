@@ -22,6 +22,11 @@ fn main() {
         }
     }
 
-    input::disable_raw_mode().expect("Failed to disable raw mode");
+    let stats = app.stats();
     render::teardown();
+    input::disable_raw_mode().expect("Failed to disable raw mode");
+
+    if let Some(s) = stats {
+        render::print_stats(&s);
+    }
 }

@@ -1,6 +1,6 @@
 use std::io::{self, Write};
 
-use crate::types::{CharState, Layout};
+use crate::types::{CharState, Layout, TestStats};
 
 #[repr(C)]
 struct WinSize {
@@ -74,4 +74,13 @@ pub fn setup() {
 
 pub fn teardown() {
     leave_alternate_buffer();
+}
+
+pub fn print_stats(stats: &TestStats) {
+    println!("WPM:        {:.0}", stats.wpm);
+    println!("Accuracy:   {:.1}%", stats.accuracy);
+    println!("Errors:     {}", stats.errors);
+    println!("Correct:    {}", stats.correct);
+    println!("Total:      {}", stats.total);
+    println!("Time:       {:.1}s", stats.elapsed_secs);
 }

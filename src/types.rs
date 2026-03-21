@@ -17,4 +17,13 @@ pub struct Layout {
     pub cursor_col: u16,
 }
 
+pub struct TestStats {
+    pub wpm: f64,
+    pub accuracy: f64,
+    pub errors: usize,
+    pub correct: usize,
+    pub total: usize,
+    pub elapsed_secs: f64,
+}
+
 pub const PADDING: u16 = 8;

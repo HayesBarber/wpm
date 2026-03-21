@@ -1,4 +1,6 @@
-use crate::types::{CharState, Layout, PADDING, TypedChar};
+use std::time::Instant;
+
+use crate::types::{CharState, Layout, PADDING, TestStats, TypedChar};
 
 pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
     let max_width = cols.saturating_sub(2 * PADDING);
@@ -76,5 +78,36 @@ pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
         lines: positioned_lines,
         cursor_row,
         cursor_col,
+    }
+}
+
+pub fn compute_stats(chars: &[TypedChar], start_time: Instant) -> TestStats {
+    let elapsed_secs = start_time.elapsed().as_secs_f64();
+    let total = chars.len();
+    let correct = chars
+        .iter()
+        .filter(|tc| tc.state == CharState::Correct)
+        .count();
+    let errors = chars
+        .iter()
+        .filter(|tc| tc.state == CharState::Incorrect)
+        .count();
+    let accuracy = if total > 0 {
+        (correct as f64 / total as f64) * 100.0
+    } else {
+        0.0
+    };
+    let wpm = if elapsed_secs > 0.0 {
+        (correct as f64 * 60.0) / (elapsed_secs * 5.0)
+    } else {
+        0.0
+    };
+    TestStats {
+        wpm,
+        accuracy,
+        errors,
+        correct,
+        total,
+        elapsed_secs,
     }
 }
