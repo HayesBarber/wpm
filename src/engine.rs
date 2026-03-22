@@ -88,7 +88,7 @@ pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
         positioned_lines.push(positioned);
     }
 
-    let text_row_start = text_start;
+    let text_row_start = text_start.saturating_sub(1);
     let text_row_end = text_start + std::cmp::max(lines.len() as u16, 1);
     let text_col_start = PADDING + TEXT_INSET;
     let text_col_end = cols.saturating_sub(PADDING + TEXT_INSET);

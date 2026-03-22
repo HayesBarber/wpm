@@ -1,6 +1,6 @@
 use std::io::{self, Write};
 
-use crate::types::{CharState, Layout, TestStats, TypedChar, TEXT_BG_COLOR};
+use crate::types::{CharState, Layout, TEXT_BG_COLOR, TestStats, TypedChar};
 
 #[repr(C)]
 struct WinSize {
@@ -95,6 +95,13 @@ pub fn render_layout(layout: &Layout) {
         for &(row, col, ch) in line {
             move_cursor(row, col);
             print!("{}", ch);
+        }
+    }
+    let (row_start, row_end, col_start, col_end) = layout.text_area;
+    for r in row_start..=row_end {
+        for c in col_start..=col_end {
+            move_cursor(r, c);
+            print_styled_bg(' ', CharState::Background);
         }
     }
     for line in &layout.lines {
