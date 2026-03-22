@@ -25,6 +25,6 @@ wpm 100      # 100 words (max)
 ## Shoutouts
 
 - [MonkeyType](https://monkeytype.com)
-- [toipe](https://github.com/aspect-build/toipe)
+- [toipe](https://github.com/Samyak2/toipe)
 - [opencode](https://opencode.ai)
 
