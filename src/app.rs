@@ -7,6 +7,7 @@ use crate::types::{CharState, Layout, TestStats, TypedChar};
 
 pub struct App {
     chars: Vec<TypedChar>,
+    num_words: usize,
     layout: Layout,
     prev_buf: ScreenBuf,
     cursor_index: usize,
@@ -36,6 +37,7 @@ impl App {
 
         App {
             chars,
+            num_words,
             layout,
             prev_buf,
             cursor_index: 0,
@@ -56,6 +58,12 @@ impl App {
                 code: KeyCode::Esc, ..
             }) => true,
             Event::Key(KeyEvent {
+                code: KeyCode::Tab, ..
+            }) => {
+                self.reset();
+                false
+            }
+            Event::Key(KeyEvent {
                 code: KeyCode::Backspace,
                 ..
             }) => self.handle_backspace(),
@@ -66,6 +74,20 @@ impl App {
             }) if !modifiers.contains(KeyModifiers::CONTROL) => self.handle_char_input(ch),
             _ => false,
         }
+    }
+
+    fn reset(&mut self) {
+        let words = crate::generator::generate(self.num_words);
+        self.chars = words
+            .chars()
+            .map(|ch| TypedChar {
+                ch,
+                state: CharState::Pending,
+            })
+            .collect();
+        self.cursor_index = 0;
+        self.start_time = None;
+        self.refresh();
     }
 
     fn handle_char_input(&mut self, ch: char) -> bool {
