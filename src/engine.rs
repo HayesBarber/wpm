@@ -5,6 +5,7 @@ use crate::types::{CharState, Layout, MAX_LINE_WIDTH, PADDING, TestStats, TextAr
 
 const BANNER_TO_CONTROLS_GAP: u16 = 2;
 const CONTROLS_TO_TEXT_GAP: u16 = 3;
+const SHRINKWRAP_PADDING: u16 = 12;
 
 fn make_banner_lines(
     banner_rows: &[&str],
@@ -58,6 +59,7 @@ pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
     let max_height = rows.saturating_sub(2 * PADDING);
 
     let mut lines: Vec<Vec<TypedChar>> = Vec::new();
+    let mut line_lengths: Vec<u16> = Vec::new();
     let mut current_line: Vec<TypedChar> = Vec::new();
     let mut word_len: u16 = 0;
     let mut line_char_count: u16 = 0;
@@ -66,6 +68,7 @@ pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
         if tc.ch == ' ' {
             if line_char_count > 0 && line_char_count + 1 + word_len > max_width {
                 lines.push(current_line);
+                line_lengths.push(line_char_count);
                 current_line = Vec::new();
                 line_char_count = 0;
             }
@@ -84,12 +87,16 @@ pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
     if word_len > 0 {
         if line_char_count > 0 && line_char_count + 1 + word_len > max_width {
             lines.push(current_line);
+            line_lengths.push(line_char_count);
             current_line = Vec::new();
+            line_char_count = 0;
         }
+        line_char_count += word_len;
     }
 
     if !current_line.is_empty() {
         lines.push(current_line);
+        line_lengths.push(line_char_count);
     }
 
     let banner_rows: Vec<&str> = BANNER.split('\n').collect();
@@ -121,10 +128,14 @@ pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
         positioned_lines.push(positioned);
     }
 
-    let text_row_start = text_start.saturating_sub(1);
-    let text_row_end = text_start + 1 + std::cmp::max(lines.len() as u16, 1);
-    let text_col_start = 0;
-    let text_col_end = cols + 1;
+    let text_row_start = text_start.saturating_sub(2);
+    let text_row_end = text_start + 2 + std::cmp::max(lines.len() as u16, 1);
+    let max_line_len = line_lengths.iter().copied().max().unwrap_or(0);
+    let text_area_width = max_line_len + 2 * SHRINKWRAP_PADDING;
+    let available_width = cols.saturating_sub(2 * PADDING);
+    let text_area_left = PADDING + available_width.saturating_sub(text_area_width) / 2;
+    let text_col_start = text_area_left;
+    let text_col_end = text_area_left + text_area_width;
 
     let mut cursor_row = text_start;
     let mut cursor_col = PADDING;
