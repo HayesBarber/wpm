@@ -3,7 +3,7 @@ use std::time::Instant;
 use crate::banner::BANNER;
 use crate::types::{CharState, Layout, MAX_LINE_WIDTH, PADDING, TestStats, TypedChar};
 
-const BANNER_GAP: u16 = 2;
+const BANNER_GAP: u16 = 4;
 
 fn make_banner_lines(cols: u16, start_row: u16) -> Vec<Vec<(u16, u16, char)>> {
     let mut lines = Vec::new();
