@@ -1,4 +1,4 @@
-use crate::types::{CharState, Layout, TypedChar};
+use crate::types::{CharState, Layout, TextArea, TypedChar};
 
 const EMPTY: TypedChar = TypedChar {
     ch: ' ',
@@ -55,7 +55,12 @@ impl ScreenBuf {
     }
 
     pub fn apply_layout(&mut self, layout: &Layout) {
-        let (row_start, row_end, col_start, col_end) = layout.text_area;
+        let TextArea {
+            row_start,
+            row_end,
+            col_start,
+            col_end,
+        } = layout.text_area;
         for r in row_start..row_end {
             for c in col_start..col_end {
                 self.set(r as usize, c as usize, ' ', CharState::Background);

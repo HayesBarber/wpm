@@ -1,7 +1,7 @@
 use std::time::Instant;
 
 use crate::banner::BANNER;
-use crate::types::{CharState, Layout, MAX_LINE_WIDTH, PADDING, TestStats, TypedChar};
+use crate::types::{CharState, Layout, MAX_LINE_WIDTH, PADDING, TestStats, TextArea, TypedChar};
 
 const BANNER_GAP: u16 = 4;
 
@@ -89,7 +89,7 @@ pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
     }
 
     let text_row_start = text_start.saturating_sub(1);
-    let text_row_end = text_start + std::cmp::max(lines.len() as u16, 1);
+    let text_row_end = text_start + 1 + std::cmp::max(lines.len() as u16, 1);
     let text_col_start = 0;
     let text_col_end = cols;
 
@@ -114,7 +114,12 @@ pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
     Layout {
         banner_lines,
         lines: positioned_lines,
-        text_area: (text_row_start, text_row_end, text_col_start, text_col_end),
+        text_area: TextArea {
+            row_start: text_row_start,
+            row_end: text_row_end,
+            col_start: text_col_start,
+            col_end: text_col_end,
+        },
         cursor_row,
         cursor_col,
     }

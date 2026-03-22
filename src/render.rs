@@ -1,6 +1,9 @@
 use std::io::{self, Write};
 
-use crate::types::{CharState, Layout, TEXT_BG_COLOR, TestStats, TypedChar};
+use crate::types::{
+    COLOR_BG, COLOR_CORRECT, COLOR_INCORRECT, COLOR_PENDING, COLOR_RESET, CharState, Layout,
+    TestStats, TextArea, TypedChar,
+};
 
 #[repr(C)]
 struct WinSize {
@@ -47,21 +50,12 @@ fn move_cursor(row: u16, col: u16) {
     print!("\x1b[{};{}H", row, col);
 }
 
-fn print_styled(ch: char, state: CharState) {
-    match state {
-        CharState::Correct => print!("\x1b[1;92m{}\x1b[0m", ch),
-        CharState::Incorrect => print!("\x1b[1;91m{}\x1b[0m", ch),
-        CharState::Pending | CharState::Background => print!("\x1b[90m{}\x1b[0m", ch),
-    }
-}
-
 fn print_styled_bg(ch: char, state: CharState) {
-    let bg = format!("\x1b[48;5;{}m", TEXT_BG_COLOR);
     match state {
-        CharState::Background => print!("{} \x1b[0m", bg),
-        CharState::Correct => print!("{}\x1b[1;92m{}\x1b[0m", bg, ch),
-        CharState::Incorrect => print!("{}\x1b[1;91m{}\x1b[0m", bg, ch),
-        CharState::Pending => print!("{}\x1b[90m{}\x1b[0m", bg, ch),
+        CharState::Background => print!("{} {}{}", COLOR_BG, ch, COLOR_RESET),
+        CharState::Correct => print!("{}{}{}{}", COLOR_BG, COLOR_CORRECT, ch, COLOR_RESET),
+        CharState::Incorrect => print!("{}{}{}{}", COLOR_BG, COLOR_INCORRECT, ch, COLOR_RESET),
+        CharState::Pending => print!("{}{}{}{}", COLOR_BG, COLOR_PENDING, ch, COLOR_RESET),
     }
 }
 
@@ -88,9 +82,14 @@ pub fn render_layout(layout: &Layout) {
             print!("{}", ch);
         }
     }
-    let (row_start, row_end, col_start, col_end) = layout.text_area;
-    for r in row_start..=row_end {
-        for c in col_start..=col_end {
+    let TextArea {
+        row_start,
+        row_end,
+        col_start,
+        col_end,
+    } = layout.text_area;
+    for r in row_start..row_end {
+        for c in col_start..col_end {
             move_cursor(r, c);
             print_styled_bg(' ', CharState::Background);
         }
@@ -106,25 +105,15 @@ pub fn render_layout(layout: &Layout) {
     io::stdout().flush().unwrap();
 }
 
-pub fn render_changes(
-    changes: &[(u16, u16, TypedChar)],
-    cursor_row: u16,
-    cursor_col: u16,
-    text_area: (u16, u16, u16, u16),
-) {
+pub fn render_changes(changes: &[(u16, u16, TypedChar)], cursor_row: u16, cursor_col: u16) {
     if changes.is_empty() {
         return;
     }
 
-    let (row_start, row_end, col_start, col_end) = text_area;
     hide_cursor();
     for &(row, col, tc) in changes {
         move_cursor(row, col);
-        if row >= row_start && row < row_end && col >= col_start && col < col_end {
-            print_styled_bg(tc.ch, tc.state);
-        } else {
-            print_styled(tc.ch, tc.state);
-        }
+        print_styled_bg(tc.ch, tc.state);
     }
     move_cursor(cursor_row, cursor_col);
     show_cursor();

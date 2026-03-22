@@ -111,12 +111,7 @@ impl App {
         desired.apply_layout(&self.layout);
 
         let changes = desired.diff(&self.prev_buf);
-        crate::render::render_changes(
-            &changes,
-            self.layout.cursor_row,
-            self.layout.cursor_col,
-            self.layout.text_area,
-        );
+        crate::render::render_changes(&changes, self.layout.cursor_row, self.layout.cursor_col);
 
         self.prev_buf = desired;
     }

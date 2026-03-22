@@ -12,10 +12,17 @@ pub struct TypedChar {
     pub state: CharState,
 }
 
+pub struct TextArea {
+    pub row_start: u16,
+    pub row_end: u16,
+    pub col_start: u16,
+    pub col_end: u16,
+}
+
 pub struct Layout {
     pub banner_lines: Vec<Vec<(u16, u16, char)>>,
     pub lines: Vec<Vec<(u16, u16, TypedChar)>>,
-    pub text_area: (u16, u16, u16, u16),
+    pub text_area: TextArea,
     pub cursor_row: u16,
     pub cursor_col: u16,
 }
@@ -31,4 +38,9 @@ pub struct TestStats {
 
 pub const PADDING: u16 = 8;
 pub const MAX_LINE_WIDTH: u16 = 50;
-pub const TEXT_BG_COLOR: u8 = 234;
+
+pub const COLOR_CORRECT: &str = "\x1b[1;92m";
+pub const COLOR_INCORRECT: &str = "\x1b[1;91m";
+pub const COLOR_PENDING: &str = "\x1b[90m";
+pub const COLOR_BG: &str = "\x1b[48;5;234m";
+pub const COLOR_RESET: &str = "\x1b[0m";
