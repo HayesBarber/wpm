@@ -1,6 +1,6 @@
 use std::io::{self, Write};
 
-use crate::types::{CharState, Layout, TestStats, TypedChar};
+use crate::types::{CharState, Layout, TestStats, TypedChar, TEXT_BG_COLOR};
 
 #[repr(C)]
 struct WinSize {
@@ -51,7 +51,17 @@ fn print_styled(ch: char, state: CharState) {
     match state {
         CharState::Correct => print!("\x1b[1;92m{}\x1b[0m", ch),
         CharState::Incorrect => print!("\x1b[1;91m{}\x1b[0m", ch),
-        CharState::Pending => print!("\x1b[90m{}\x1b[0m", ch),
+        CharState::Pending | CharState::Background => print!("\x1b[90m{}\x1b[0m", ch),
+    }
+}
+
+fn print_styled_bg(ch: char, state: CharState) {
+    let bg = format!("\x1b[48;5;{}m", TEXT_BG_COLOR);
+    match state {
+        CharState::Background => print!("{} \x1b[0m", bg),
+        CharState::Correct => print!("{}\x1b[1;92m{}\x1b[0m", bg, ch),
+        CharState::Incorrect => print!("{}\x1b[1;91m{}\x1b[0m", bg, ch),
+        CharState::Pending => print!("{}\x1b[90m{}\x1b[0m", bg, ch),
     }
 }
 
@@ -71,6 +81,16 @@ pub fn get_terminal_size() -> (u16, u16) {
 pub fn render_layout(layout: &Layout) {
     clear_screen();
     hide_cursor();
+
+    let (row_start, row_end, col_start, col_end) = layout.text_area;
+    let bg = format!("\x1b[48;5;{}m", TEXT_BG_COLOR);
+    for row in row_start..row_end {
+        move_cursor(row, col_start);
+        for _ in col_start..col_end {
+            print!("{}\x1b[0m", bg);
+        }
+    }
+
     for line in &layout.banner_lines {
         for &(row, col, ch) in line {
             move_cursor(row, col);
@@ -80,7 +100,7 @@ pub fn render_layout(layout: &Layout) {
     for line in &layout.lines {
         for &(row, col, tc) in line {
             move_cursor(row, col);
-            print_styled(tc.ch, tc.state);
+            print_styled_bg(tc.ch, tc.state);
         }
     }
     move_cursor(layout.cursor_row, layout.cursor_col);
@@ -88,15 +108,25 @@ pub fn render_layout(layout: &Layout) {
     io::stdout().flush().unwrap();
 }
 
-pub fn render_changes(changes: &[(u16, u16, TypedChar)], cursor_row: u16, cursor_col: u16) {
+pub fn render_changes(
+    changes: &[(u16, u16, TypedChar)],
+    cursor_row: u16,
+    cursor_col: u16,
+    text_area: (u16, u16, u16, u16),
+) {
     if changes.is_empty() {
         return;
     }
 
+    let (row_start, row_end, col_start, col_end) = text_area;
     hide_cursor();
     for &(row, col, tc) in changes {
         move_cursor(row, col);
-        print_styled(tc.ch, tc.state);
+        if row >= row_start && row < row_end && col >= col_start && col < col_end {
+            print_styled_bg(tc.ch, tc.state);
+        } else {
+            print_styled(tc.ch, tc.state);
+        }
     }
     move_cursor(cursor_row, cursor_col);
     show_cursor();

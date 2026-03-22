@@ -3,6 +3,7 @@ pub enum CharState {
     Pending,
     Correct,
     Incorrect,
+    Background,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -14,6 +15,7 @@ pub struct TypedChar {
 pub struct Layout {
     pub banner_lines: Vec<Vec<(u16, u16, char)>>,
     pub lines: Vec<Vec<(u16, u16, TypedChar)>>,
+    pub text_area: (u16, u16, u16, u16),
     pub cursor_row: u16,
     pub cursor_col: u16,
 }
@@ -29,3 +31,5 @@ pub struct TestStats {
 
 pub const PADDING: u16 = 8;
 pub const MAX_LINE_WIDTH: u16 = 50;
+pub const TEXT_BG_COLOR: u8 = 236;
+pub const TEXT_INSET: u16 = 1;
