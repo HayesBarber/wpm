@@ -71,6 +71,12 @@ pub fn get_terminal_size() -> (u16, u16) {
 pub fn render_layout(layout: &Layout) {
     clear_screen();
     hide_cursor();
+    for line in &layout.banner_lines {
+        for &(row, col, ch) in line {
+            move_cursor(row, col);
+            print!("{}", ch);
+        }
+    }
     for line in &layout.lines {
         for &(row, col, tc) in line {
             move_cursor(row, col);

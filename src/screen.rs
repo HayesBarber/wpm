@@ -55,6 +55,11 @@ impl ScreenBuf {
     }
 
     pub fn apply_layout(&mut self, layout: &Layout) {
+        for line in &layout.banner_lines {
+            for &(row, col, ch) in line {
+                self.set(row as usize, col as usize, ch, CharState::Pending);
+            }
+        }
         for line in &layout.lines {
             for &(row, col, tc) in line {
                 self.set(row as usize, col as usize, tc.ch, tc.state);
