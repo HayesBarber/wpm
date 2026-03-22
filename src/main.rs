@@ -7,9 +7,26 @@ mod render;
 mod screen;
 mod types;
 
+fn print_help() {
+    println!("Usage: wpm [word_count]");
+    println!();
+    println!("A terminal typing speed test.");
+    println!();
+    println!("Arguments:");
+    println!("  [word_count]  Number of words to type (default: 25, max: 100)");
+    println!();
+    println!("Options:");
+    println!("  -h, --help    Print this help message");
+}
+
 fn main() {
-    let word_count: usize = std::env::args()
-        .nth(1)
+    let first_arg = std::env::args().nth(1);
+    if first_arg.as_deref() == Some("-h") || first_arg.as_deref() == Some("--help") {
+        print_help();
+        return;
+    }
+
+    let word_count: usize = first_arg
         .and_then(|s| s.parse().ok())
         .unwrap_or(25)
         .min(100);
