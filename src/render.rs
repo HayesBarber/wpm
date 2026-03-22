@@ -82,15 +82,6 @@ pub fn render_layout(layout: &Layout) {
     clear_screen();
     hide_cursor();
 
-    let (row_start, row_end, col_start, col_end) = layout.text_area;
-    let bg = format!("\x1b[48;5;{}m", TEXT_BG_COLOR);
-    for row in row_start..row_end {
-        move_cursor(row, col_start);
-        for _ in col_start..col_end {
-            print!("{}\x1b[0m", bg);
-        }
-    }
-
     for line in &layout.banner_lines {
         for &(row, col, ch) in line {
             move_cursor(row, col);
