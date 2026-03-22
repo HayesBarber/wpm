@@ -148,7 +148,7 @@ pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
         let ch = if c == border_left || c == border_right {
             '+'
         } else {
-            '-'
+            '─'
         };
         border_lines.push((
             border_top,
@@ -173,7 +173,7 @@ pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
             r,
             border_left,
             TypedChar {
-                ch: '|',
+                ch: '│',
                 state: CharState::Border,
             },
         ));
@@ -181,7 +181,7 @@ pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
             r,
             border_right,
             TypedChar {
-                ch: '|',
+                ch: '│',
                 state: CharState::Border,
             },
         ));
