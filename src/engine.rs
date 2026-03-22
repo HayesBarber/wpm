@@ -176,10 +176,11 @@ pub fn layout(cols: u16, rows: u16, chars: &[TypedChar], cursor_index: usize) ->
     let total = chars.iter().filter(|tc| tc.ch == ' ').count() + 1;
     let counter_text = format!("{}/{}", completed, total);
     let counter_row = text_row_end + 1;
+    let counter_start_col = text_col_end.saturating_sub(counter_text.len() as u16);
     let counter_line: Vec<(u16, u16, char)> = counter_text
         .chars()
         .enumerate()
-        .map(|(i, ch)| (counter_row, text_col_start + i as u16, ch))
+        .map(|(i, ch)| (counter_row, counter_start_col + i as u16, ch))
         .collect();
 
     Layout {

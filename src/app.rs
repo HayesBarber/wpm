@@ -14,6 +14,8 @@ pub struct App {
     term_rows: u16,
     term_cols: u16,
     start_time: Option<Instant>,
+    prev_counter_row: u16,
+    prev_counter_end_col: u16,
 }
 
 impl App {
@@ -35,6 +37,9 @@ impl App {
         let mut prev_buf = ScreenBuf::new(term_rows as usize, term_cols as usize);
         prev_buf.apply_layout(&layout);
 
+        let prev_counter_row = layout.counter_line.first().map_or(0, |&(r, _, _)| r);
+        let prev_counter_end_col = layout.counter_line.last().map_or(0, |&(_, c, _)| c + 1);
+
         App {
             chars,
             num_words,
@@ -44,6 +49,8 @@ impl App {
             term_rows,
             term_cols,
             start_time: None,
+            prev_counter_row,
+            prev_counter_end_col,
         }
     }
 
@@ -137,8 +144,33 @@ impl App {
         let mut desired = ScreenBuf::new(self.prev_buf.rows, self.prev_buf.cols);
         desired.apply_layout(&self.layout);
 
+        let new_counter_row = self.layout.counter_line.first().map_or(0, |&(r, _, _)| r);
+        let new_counter_start_col = self.layout.counter_line.first().map_or(0, |&(_, c, _)| c);
+        let new_counter_end_col = self
+            .layout
+            .counter_line
+            .last()
+            .map_or(0, |&(_, c, _)| c + 1);
+
+        let clear_start = new_counter_start_col.min(
+            self.prev_counter_end_col
+                .saturating_sub(new_counter_end_col.saturating_sub(new_counter_start_col)),
+        );
+        let clear_end = new_counter_end_col.max(self.prev_counter_end_col);
+
+        self.prev_counter_row = new_counter_row;
+        self.prev_counter_end_col = clear_end;
+
         let changes = desired.diff(&self.prev_buf);
-        crate::render::render_changes(&changes, self.layout.cursor_row, self.layout.cursor_col);
+        crate::render::render_changes(
+            &changes,
+            self.layout.cursor_row,
+            self.layout.cursor_col,
+            &self.layout.counter_line,
+            new_counter_row,
+            clear_start,
+            clear_end,
+        );
 
         self.prev_buf = desired;
     }
