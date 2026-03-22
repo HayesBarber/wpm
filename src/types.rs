@@ -32,4 +32,3 @@ pub struct TestStats {
 pub const PADDING: u16 = 8;
 pub const MAX_LINE_WIDTH: u16 = 50;
 pub const TEXT_BG_COLOR: u8 = 236;
-pub const TEXT_INSET: u16 = 1;
