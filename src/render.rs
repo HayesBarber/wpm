@@ -53,7 +53,7 @@ fn move_cursor(row: u16, col: u16) {
 fn print_styled_bg(ch: char, state: CharState) {
     match state {
         CharState::Background => print!("{}{}{}", COLOR_BG, ch, COLOR_RESET),
-        CharState::Border => print!("{}{}", COLOR_BORDER, ch),
+        CharState::Border => print!("{}{}{}{}", COLOR_BG, COLOR_BORDER, ch, COLOR_RESET),
         CharState::Correct => print!("{}{}{}{}", COLOR_BG, COLOR_CORRECT, ch, COLOR_RESET),
         CharState::Incorrect => print!("{}{}{}{}", COLOR_BG, COLOR_INCORRECT, ch, COLOR_RESET),
         CharState::Pending => print!("{}{}{}{}", COLOR_BG, COLOR_PENDING, ch, COLOR_RESET),

@@ -5,7 +5,7 @@ use crate::types::{CharState, Layout, MAX_LINE_WIDTH, PADDING, TestStats, TextAr
 
 const BANNER_TO_CONTROLS_GAP: u16 = 2;
 const CONTROLS_TO_TEXT_GAP: u16 = 3;
-const SHRINKWRAP_PADDING: u16 = 12;
+const SHRINKWRAP_PADDING: u16 = 8;
 
 fn make_banner_lines(
     banner_rows: &[&str],
@@ -128,8 +128,8 @@ pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
         positioned_lines.push(positioned);
     }
 
-    let text_row_start = text_start.saturating_sub(3);
-    let text_row_end = text_start + 3 + std::cmp::max(lines.len() as u16, 1);
+    let text_row_start = text_start.saturating_sub(2);
+    let text_row_end = text_start + 2 + std::cmp::max(lines.len() as u16, 1);
     let max_line_len = line_lengths.iter().copied().max().unwrap_or(0);
     let text_area_width = max_line_len + 2 * SHRINKWRAP_PADDING;
     let available_width = cols.saturating_sub(2 * PADDING);
@@ -138,62 +138,12 @@ pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
     let text_col_end = text_area_left + text_area_width + 1;
 
     let mut border_lines = Vec::new();
-    let border_top = text_row_start;
-    let border_bottom = text_row_end.saturating_sub(1);
-    let border_left = text_col_start;
-    let border_right = text_col_end.saturating_sub(1);
-
-    // Top edge
-    for c in border_left..=border_right {
-        let ch = if c == border_left {
-            '╭'
-        } else if c == border_right {
-            '╮'
-        } else {
-            '─'
-        };
-        border_lines.push((
-            border_top,
-            c,
-            TypedChar {
-                ch,
-                state: CharState::Border,
-            },
-        ));
-    }
-    // Bottom edge
-    for c in border_left..=border_right {
-        let ch = if c == border_left {
-            '╰'
-        } else if c == border_right {
-            '╯'
-        } else {
-            '─'
-        };
-        border_lines.push((
-            border_bottom,
-            c,
-            TypedChar {
-                ch,
-                state: CharState::Border,
-            },
-        ));
-    }
-    // Left and right edges (excluding corners already drawn)
-    for r in (border_top + 1)..border_bottom {
+    for r in text_row_start..text_row_end {
         border_lines.push((
             r,
-            border_left,
+            text_col_start,
             TypedChar {
-                ch: '│',
-                state: CharState::Border,
-            },
-        ));
-        border_lines.push((
-            r,
-            border_right,
-            TypedChar {
-                ch: '│',
+                ch: '▌',
                 state: CharState::Border,
             },
         ));
