@@ -66,6 +66,9 @@ impl ScreenBuf {
                 self.set(r as usize, c as usize, ' ', CharState::Background);
             }
         }
+        for &(row, col, tc) in &layout.border_lines {
+            self.set(row as usize, col as usize, tc.ch, tc.state);
+        }
         for line in &layout.banner_lines {
             for &(row, col, ch) in line {
                 self.set(row as usize, col as usize, ch, CharState::Pending);

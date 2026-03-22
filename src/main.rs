@@ -11,7 +11,8 @@ fn main() {
     let word_count: usize = std::env::args()
         .nth(1)
         .and_then(|s| s.parse().ok())
-        .unwrap_or(25);
+        .unwrap_or(25)
+        .min(100);
 
     render::setup();
     input::enable_raw_mode().expect("Failed to enable raw mode");

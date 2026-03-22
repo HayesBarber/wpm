@@ -1,8 +1,8 @@
 use std::io::{self, Write};
 
 use crate::types::{
-    COLOR_BG, COLOR_CORRECT, COLOR_DIM, COLOR_INCORRECT, COLOR_KEY, COLOR_PENDING, COLOR_RESET,
-    CharState, Layout, TestStats, TextArea, TypedChar,
+    COLOR_BG, COLOR_BORDER, COLOR_CORRECT, COLOR_DIM, COLOR_INCORRECT, COLOR_KEY, COLOR_PENDING,
+    COLOR_RESET, CharState, Layout, TestStats, TextArea, TypedChar,
 };
 
 #[repr(C)]
@@ -53,6 +53,7 @@ fn move_cursor(row: u16, col: u16) {
 fn print_styled_bg(ch: char, state: CharState) {
     match state {
         CharState::Background => print!("{}{}{}", COLOR_BG, ch, COLOR_RESET),
+        CharState::Border => print!("{}{}{}{}", COLOR_BG, COLOR_BORDER, ch, COLOR_RESET),
         CharState::Correct => print!("{}{}{}{}", COLOR_BG, COLOR_CORRECT, ch, COLOR_RESET),
         CharState::Incorrect => print!("{}{}{}{}", COLOR_BG, COLOR_INCORRECT, ch, COLOR_RESET),
         CharState::Pending => print!("{}{}{}{}", COLOR_BG, COLOR_PENDING, ch, COLOR_RESET),
@@ -100,6 +101,10 @@ pub fn render_layout(layout: &Layout) {
             move_cursor(r, c);
             print_styled_bg(' ', CharState::Background);
         }
+    }
+    for &(row, col, tc) in &layout.border_lines {
+        move_cursor(row, col);
+        print_styled_bg(tc.ch, tc.state);
     }
     for line in &layout.lines {
         for &(row, col, tc) in line {
