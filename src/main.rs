@@ -3,6 +3,7 @@ mod engine;
 mod generator;
 mod input;
 mod render;
+mod screen;
 mod types;
 
 fn main() {

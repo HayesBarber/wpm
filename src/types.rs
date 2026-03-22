@@ -1,11 +1,11 @@
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum CharState {
     Pending,
     Correct,
     Incorrect,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct TypedChar {
     pub ch: char,
     pub state: CharState,
