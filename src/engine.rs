@@ -5,9 +5,12 @@ use crate::types::{CharState, Layout, MAX_LINE_WIDTH, PADDING, TestStats, TypedC
 
 const BANNER_GAP: u16 = 4;
 
-fn make_banner_lines(cols: u16, start_row: u16) -> Vec<Vec<(u16, u16, char)>> {
+fn make_banner_lines(
+    banner_rows: &[&str],
+    cols: u16,
+    start_row: u16,
+) -> Vec<Vec<(u16, u16, char)>> {
     let mut lines = Vec::new();
-    let banner_rows: Vec<&str> = BANNER.split('\n').collect();
     let available_width = cols.saturating_sub(2 * PADDING);
 
     for (idx, row) in banner_rows.iter().enumerate() {
@@ -63,12 +66,13 @@ pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
         lines.push(current_line);
     }
 
-    let banner_height: u16 = BANNER.split('\n').count() as u16;
+    let banner_rows: Vec<&str> = BANNER.split('\n').collect();
+    let banner_height: u16 = banner_rows.len() as u16;
     let total_height = banner_height + BANNER_GAP + lines.len() as u16;
     let combined_start = PADDING + max_height.saturating_sub(total_height) / 2;
     let text_start = combined_start + banner_height + BANNER_GAP;
 
-    let banner_lines = make_banner_lines(cols, combined_start);
+    let banner_lines = make_banner_lines(&banner_rows, cols, combined_start);
 
     let mut positioned_lines: Vec<Vec<(u16, u16, TypedChar)>> = Vec::new();
     for (line_idx, line) in lines.iter().enumerate() {
