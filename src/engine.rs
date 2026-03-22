@@ -3,7 +3,8 @@ use std::time::Instant;
 use crate::banner::BANNER;
 use crate::types::{CharState, Layout, MAX_LINE_WIDTH, PADDING, TestStats, TextArea, TypedChar};
 
-const BANNER_GAP: u16 = 4;
+const BANNER_TO_CONTROLS_GAP: u16 = 2;
+const CONTROLS_TO_TEXT_GAP: u16 = 3;
 
 fn make_banner_lines(
     banner_rows: &[&str],
@@ -25,6 +26,31 @@ fn make_banner_lines(
         lines.push(line);
     }
     lines
+}
+
+fn make_controls_lines(cols: u16, start_row: u16) -> Vec<Vec<(u16, u16, char)>> {
+    let parts = vec![
+        "Tab:".to_string(),
+        " restart ".to_string(),
+        "Ctrl+C/Esc:".to_string(),
+        " quit ".to_string(),
+    ];
+    let full_text: String = parts.concat();
+    let text_len = full_text.chars().count() as u16;
+    let available_width = cols.saturating_sub(2 * PADDING);
+    let start_col = PADDING + available_width.saturating_sub(text_len) / 2;
+
+    let mut result = Vec::new();
+    let mut col = start_col;
+    for part in &parts {
+        let mut chars = Vec::new();
+        for ch in part.chars() {
+            chars.push((start_row, col, ch));
+            col += 1;
+        }
+        result.push(chars);
+    }
+    result
 }
 
 pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
@@ -68,11 +94,18 @@ pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
 
     let banner_rows: Vec<&str> = BANNER.split('\n').collect();
     let banner_height: u16 = banner_rows.len() as u16;
-    let total_height = banner_height + BANNER_GAP + lines.len() as u16;
+    let controls_height: u16 = 1;
+    let total_height = banner_height
+        + BANNER_TO_CONTROLS_GAP
+        + controls_height
+        + CONTROLS_TO_TEXT_GAP
+        + lines.len() as u16;
     let combined_start = PADDING + max_height.saturating_sub(total_height) / 2;
-    let text_start = combined_start + banner_height + BANNER_GAP;
+    let controls_start = combined_start + banner_height + BANNER_TO_CONTROLS_GAP;
+    let text_start = controls_start + controls_height + CONTROLS_TO_TEXT_GAP;
 
     let banner_lines = make_banner_lines(&banner_rows, cols, combined_start);
+    let controls_lines = make_controls_lines(cols, controls_start);
 
     let mut positioned_lines: Vec<Vec<(u16, u16, TypedChar)>> = Vec::new();
     for (line_idx, line) in lines.iter().enumerate() {
@@ -113,6 +146,7 @@ pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
 
     Layout {
         banner_lines,
+        controls_lines,
         lines: positioned_lines,
         text_area: TextArea {
             row_start: text_row_start,
