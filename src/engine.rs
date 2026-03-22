@@ -8,11 +8,11 @@ const BANNER_GAP: u16 = 2;
 fn make_banner_lines(cols: u16) -> Vec<Vec<(u16, u16, char)>> {
     let mut lines = Vec::new();
     let banner_rows: Vec<&str> = BANNER.split('\n').collect();
-    let banner_width = banner_rows.iter().map(|l| l.len()).max().unwrap_or(0) as u16;
     let available_width = cols.saturating_sub(2 * PADDING);
-    let start_col = PADDING + available_width.saturating_sub(banner_width) / 2;
 
     for (idx, row) in banner_rows.iter().enumerate() {
+        let line_len = row.chars().count() as u16;
+        let start_col = PADDING + available_width.saturating_sub(line_len) / 2;
         let mut line = Vec::new();
         for (col_idx, ch) in row.chars().enumerate() {
             if ch != ' ' {
