@@ -91,7 +91,7 @@ pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
     let text_row_start = text_start.saturating_sub(1);
     let text_row_end = text_start + 1 + std::cmp::max(lines.len() as u16, 1);
     let text_col_start = 0;
-    let text_col_end = cols;
+    let text_col_end = cols + 1;
 
     let mut cursor_row = text_start;
     let mut cursor_col = PADDING;
