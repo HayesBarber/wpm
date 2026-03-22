@@ -112,13 +112,25 @@ pub fn render_layout(layout: &Layout) {
             print_styled_bg(tc.ch, tc.state);
         }
     }
+    for &(row, col, ch) in &layout.counter_line {
+        move_cursor(row, col);
+        print!("{}{}{}", COLOR_DIM, ch, COLOR_RESET);
+    }
     move_cursor(layout.cursor_row, layout.cursor_col);
     show_cursor();
     io::stdout().flush().unwrap();
 }
 
-pub fn render_changes(changes: &[(u16, u16, TypedChar)], cursor_row: u16, cursor_col: u16) {
-    if changes.is_empty() {
+pub fn render_changes(
+    changes: &[(u16, u16, TypedChar)],
+    cursor_row: u16,
+    cursor_col: u16,
+    counter_line: &[(u16, u16, char)],
+    counter_row: u16,
+    clear_start: u16,
+    clear_end: u16,
+) {
+    if changes.is_empty() && counter_line.is_empty() {
         return;
     }
 
@@ -126,6 +138,17 @@ pub fn render_changes(changes: &[(u16, u16, TypedChar)], cursor_row: u16, cursor
     for &(row, col, tc) in changes {
         move_cursor(row, col);
         print_styled_bg(tc.ch, tc.state);
+    }
+    if !counter_line.is_empty() {
+        // Clear the full range to handle counter length changes
+        for c in clear_start..clear_end {
+            move_cursor(counter_row, c);
+            print!(" ");
+        }
+        for &(row, col, ch) in counter_line {
+            move_cursor(row, col);
+            print!("{}{}{}", COLOR_DIM, ch, COLOR_RESET);
+        }
     }
     move_cursor(cursor_row, cursor_col);
     show_cursor();
