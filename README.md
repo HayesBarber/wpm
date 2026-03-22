@@ -2,9 +2,7 @@
 
 A terminal typing speed test built with Rust.
 
-## Screenshot
-
-<!-- TODO: Add screenshot -->
+![Preview](./preview.png)
 
 ## Installation
 
