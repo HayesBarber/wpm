@@ -1,8 +1,8 @@
 use std::io::{self, Write};
 
 use crate::types::{
-    CharState, Layout, TestStats, TextArea, TypedChar, COLOR_BG, COLOR_CORRECT, COLOR_DIM,
-    COLOR_INCORRECT, COLOR_KEY, COLOR_PENDING, COLOR_RESET,
+    COLOR_BG, COLOR_CORRECT, COLOR_DIM, COLOR_INCORRECT, COLOR_KEY, COLOR_PENDING, COLOR_RESET,
+    CharState, Layout, TestStats, TextArea, TypedChar,
 };
 
 #[repr(C)]
