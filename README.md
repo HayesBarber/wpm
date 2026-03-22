@@ -27,4 +27,5 @@ wpm 100      # 100 words (max)
 - [MonkeyType](https://monkeytype.com)
 - [toipe](https://github.com/Samyak2/toipe)
 - [opencode](https://opencode.ai)
+- [Word list](https://gist.github.com/deekayen/4148741)
 
