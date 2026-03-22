@@ -1,6 +1,9 @@
 use std::io::{self, Write};
 
-use crate::types::{CharState, Layout, TestStats, TypedChar};
+use crate::types::{
+    COLOR_BG, COLOR_CORRECT, COLOR_INCORRECT, COLOR_PENDING, COLOR_RESET, CharState, Layout,
+    TestStats, TextArea, TypedChar,
+};
 
 #[repr(C)]
 struct WinSize {
@@ -47,11 +50,12 @@ fn move_cursor(row: u16, col: u16) {
     print!("\x1b[{};{}H", row, col);
 }
 
-fn print_styled(ch: char, state: CharState) {
+fn print_styled_bg(ch: char, state: CharState) {
     match state {
-        CharState::Correct => print!("\x1b[1;92m{}\x1b[0m", ch),
-        CharState::Incorrect => print!("\x1b[1;91m{}\x1b[0m", ch),
-        CharState::Pending => print!("\x1b[90m{}\x1b[0m", ch),
+        CharState::Background => print!("{}{}{}", COLOR_BG, ch, COLOR_RESET),
+        CharState::Correct => print!("{}{}{}{}", COLOR_BG, COLOR_CORRECT, ch, COLOR_RESET),
+        CharState::Incorrect => print!("{}{}{}{}", COLOR_BG, COLOR_INCORRECT, ch, COLOR_RESET),
+        CharState::Pending => print!("{}{}{}{}", COLOR_BG, COLOR_PENDING, ch, COLOR_RESET),
     }
 }
 
@@ -71,16 +75,29 @@ pub fn get_terminal_size() -> (u16, u16) {
 pub fn render_layout(layout: &Layout) {
     clear_screen();
     hide_cursor();
+
     for line in &layout.banner_lines {
         for &(row, col, ch) in line {
             move_cursor(row, col);
             print!("{}", ch);
         }
     }
+    let TextArea {
+        row_start,
+        row_end,
+        col_start,
+        col_end,
+    } = layout.text_area;
+    for r in row_start..row_end {
+        for c in col_start..col_end {
+            move_cursor(r, c);
+            print_styled_bg(' ', CharState::Background);
+        }
+    }
     for line in &layout.lines {
         for &(row, col, tc) in line {
             move_cursor(row, col);
-            print_styled(tc.ch, tc.state);
+            print_styled_bg(tc.ch, tc.state);
         }
     }
     move_cursor(layout.cursor_row, layout.cursor_col);
@@ -96,7 +113,7 @@ pub fn render_changes(changes: &[(u16, u16, TypedChar)], cursor_row: u16, cursor
     hide_cursor();
     for &(row, col, tc) in changes {
         move_cursor(row, col);
-        print_styled(tc.ch, tc.state);
+        print_styled_bg(tc.ch, tc.state);
     }
     move_cursor(cursor_row, cursor_col);
     show_cursor();
