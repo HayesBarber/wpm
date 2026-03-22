@@ -143,10 +143,12 @@ pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
     let border_left = text_col_start;
     let border_right = text_col_end.saturating_sub(1);
 
-    // Top and bottom edges
+    // Top edge
     for c in border_left..=border_right {
-        let ch = if c == border_left || c == border_right {
-            '+'
+        let ch = if c == border_left {
+            '╭'
+        } else if c == border_right {
+            '╮'
         } else {
             '─'
         };
@@ -158,6 +160,16 @@ pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
                 state: CharState::Border,
             },
         ));
+    }
+    // Bottom edge
+    for c in border_left..=border_right {
+        let ch = if c == border_left {
+            '╰'
+        } else if c == border_right {
+            '╯'
+        } else {
+            '─'
+        };
         border_lines.push((
             border_bottom,
             c,
