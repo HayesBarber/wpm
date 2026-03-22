@@ -30,12 +30,10 @@ fn make_banner_lines(
 
 fn make_controls_lines(cols: u16, start_row: u16) -> Vec<Vec<(u16, u16, char)>> {
     let parts = vec![
-        "tab".to_string(),
+        "Tab:".to_string(),
         " restart ".to_string(),
-        "esc".to_string(),
+        "Ctrl+C/Esc:".to_string(),
         " quit ".to_string(),
-        "Ctrl+c".to_string(),
-        " quit".to_string(),
     ];
     let full_text: String = parts.concat();
     let text_len = full_text.chars().count() as u16;
