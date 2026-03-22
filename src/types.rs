@@ -4,6 +4,7 @@ pub enum CharState {
     Correct,
     Incorrect,
     Background,
+    Border,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -22,6 +23,7 @@ pub struct TextArea {
 pub struct Layout {
     pub banner_lines: Vec<Vec<(u16, u16, char)>>,
     pub controls_lines: Vec<Vec<(u16, u16, char)>>,
+    pub border_lines: Vec<(u16, u16, TypedChar)>,
     pub lines: Vec<Vec<(u16, u16, TypedChar)>>,
     pub text_area: TextArea,
     pub cursor_row: u16,
@@ -44,6 +46,7 @@ pub const COLOR_CORRECT: &str = "\x1b[1;92m";
 pub const COLOR_INCORRECT: &str = "\x1b[1;91m";
 pub const COLOR_PENDING: &str = "\x1b[90m";
 pub const COLOR_BG: &str = "\x1b[48;5;234m";
+pub const COLOR_BORDER: &str = "\x1b[34m";
 pub const COLOR_KEY: &str = "\x1b[37m";
 pub const COLOR_DIM: &str = "\x1b[2m";
 pub const COLOR_RESET: &str = "\x1b[0m";
