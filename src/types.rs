@@ -28,6 +28,7 @@ pub struct Layout {
     pub text_area: TextArea,
     pub cursor_row: u16,
     pub cursor_col: u16,
+    pub counter_line: Vec<(u16, u16, char)>,
 }
 
 pub struct TestStats {

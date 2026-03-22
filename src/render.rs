@@ -112,6 +112,10 @@ pub fn render_layout(layout: &Layout) {
             print_styled_bg(tc.ch, tc.state);
         }
     }
+    for &(row, col, ch) in &layout.counter_line {
+        move_cursor(row, col);
+        print!("{}{}{}", COLOR_DIM, ch, COLOR_RESET);
+    }
     move_cursor(layout.cursor_row, layout.cursor_col);
     show_cursor();
     io::stdout().flush().unwrap();

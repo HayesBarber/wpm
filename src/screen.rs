@@ -84,5 +84,8 @@ impl ScreenBuf {
                 self.set(row as usize, col as usize, tc.ch, tc.state);
             }
         }
+        for &(row, col, ch) in &layout.counter_line {
+            self.set(row as usize, col as usize, ch, CharState::Pending);
+        }
     }
 }

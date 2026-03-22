@@ -28,7 +28,7 @@ impl App {
             .collect();
 
         let (term_cols, term_rows) = crate::render::get_terminal_size();
-        let layout = crate::engine::layout(term_cols, term_rows, &chars);
+        let layout = crate::engine::layout(term_cols, term_rows, &chars, 0);
 
         crate::render::render_layout(&layout);
 
@@ -127,7 +127,12 @@ impl App {
     }
 
     fn refresh(&mut self) {
-        self.layout = crate::engine::layout(self.term_cols, self.term_rows, &self.chars);
+        self.layout = crate::engine::layout(
+            self.term_cols,
+            self.term_rows,
+            &self.chars,
+            self.cursor_index,
+        );
 
         let mut desired = ScreenBuf::new(self.prev_buf.rows, self.prev_buf.cols);
         desired.apply_layout(&self.layout);
