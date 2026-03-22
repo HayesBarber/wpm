@@ -1,8 +1,8 @@
 use std::io::{self, Write};
 
 use crate::types::{
-    COLOR_BG, COLOR_CORRECT, COLOR_INCORRECT, COLOR_PENDING, COLOR_RESET, CharState, Layout,
-    TestStats, TextArea, TypedChar,
+    CharState, Layout, TestStats, TextArea, TypedChar, COLOR_BG, COLOR_CORRECT, COLOR_DIM,
+    COLOR_INCORRECT, COLOR_KEY, COLOR_PENDING, COLOR_RESET,
 };
 
 #[repr(C)]
@@ -80,6 +80,13 @@ pub fn render_layout(layout: &Layout) {
         for &(row, col, ch) in line {
             move_cursor(row, col);
             print!("{}", ch);
+        }
+    }
+    for (i, segment) in layout.controls_lines.iter().enumerate() {
+        let color = if i % 2 == 0 { COLOR_KEY } else { COLOR_DIM };
+        for &(row, col, ch) in segment {
+            move_cursor(row, col);
+            print!("{}{}{}", color, ch, COLOR_RESET);
         }
     }
     let TextArea {
