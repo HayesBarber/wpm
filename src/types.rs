@@ -12,6 +12,7 @@ pub struct TypedChar {
 }
 
 pub struct Layout {
+    pub banner_lines: Vec<Vec<(u16, u16, char)>>,
     pub lines: Vec<Vec<(u16, u16, TypedChar)>>,
     pub cursor_row: u16,
     pub cursor_col: u16,

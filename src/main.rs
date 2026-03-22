@@ -1,4 +1,5 @@
 mod app;
+mod banner;
 mod engine;
 mod generator;
 mod input;

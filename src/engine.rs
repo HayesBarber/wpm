@@ -1,10 +1,37 @@
 use std::time::Instant;
 
+use crate::banner::BANNER;
 use crate::types::{CharState, Layout, MAX_LINE_WIDTH, PADDING, TestStats, TypedChar};
 
+const BANNER_GAP: u16 = 2;
+
+fn make_banner_lines(cols: u16) -> Vec<Vec<(u16, u16, char)>> {
+    let mut lines = Vec::new();
+    let banner_rows: Vec<&str> = BANNER.split('\n').collect();
+    let banner_width = banner_rows.iter().map(|l| l.len()).max().unwrap_or(0) as u16;
+    let available_width = cols.saturating_sub(2 * PADDING);
+    let start_col = PADDING + available_width.saturating_sub(banner_width) / 2;
+
+    for (idx, row) in banner_rows.iter().enumerate() {
+        let mut line = Vec::new();
+        for (col_idx, ch) in row.chars().enumerate() {
+            if ch != ' ' {
+                line.push((idx as u16 + PADDING, start_col + col_idx as u16, ch));
+            }
+        }
+        lines.push(line);
+    }
+    lines
+}
+
 pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
+    let banner_lines = make_banner_lines(cols);
+    let banner_height = banner_lines.len() as u16;
+
     let max_width = std::cmp::min(cols.saturating_sub(2 * PADDING), MAX_LINE_WIDTH);
-    let max_height = rows.saturating_sub(2 * PADDING);
+    let max_height = rows
+        .saturating_sub(2 * PADDING)
+        .saturating_sub(banner_height + BANNER_GAP);
 
     let mut lines: Vec<Vec<TypedChar>> = Vec::new();
     let mut current_line: Vec<TypedChar> = Vec::new();
@@ -41,7 +68,8 @@ pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
         lines.push(current_line);
     }
 
-    let start_row = PADDING + max_height.saturating_sub(lines.len() as u16) / 2;
+    let start_row =
+        PADDING + banner_height + BANNER_GAP + max_height.saturating_sub(lines.len() as u16) / 2;
 
     let mut positioned_lines: Vec<Vec<(u16, u16, TypedChar)>> = Vec::new();
     for (line_idx, line) in lines.iter().enumerate() {
@@ -76,6 +104,7 @@ pub fn layout(cols: u16, rows: u16, chars: &[TypedChar]) -> Layout {
     }
 
     Layout {
+        banner_lines,
         lines: positioned_lines,
         cursor_row,
         cursor_col,
