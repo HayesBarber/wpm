@@ -6,8 +6,18 @@ A terminal typing speed test built with Rust.
 
 ## Installation
 
+### From source
+
 ```sh
+git clone https://github.com/HayesBarber/wpm.git
+cd wpm
 cargo install --path .
+```
+
+### Homebrew
+
+```sh
+brew install HayesBarber/tap/wpm
 ```
 
 ## Usage
@@ -16,6 +26,7 @@ cargo install --path .
 wpm          # 25 words (default)
 wpm 50       # 50 words
 wpm 100      # 100 words (max)
+wpm -h       # show help
 ```
 
 **Controls:**
